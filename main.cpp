@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-    Generator gen(5);
+    Generator gen(3);
     gen.generate();
     return 0;
 }

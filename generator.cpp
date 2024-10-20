@@ -11,6 +11,15 @@ void resizeList(std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, ui
     }
 }
 
+void printAdj(const std::vector<std::vector<std::pair<uint8_t, char>>>& list) {
+    for (size_t i=0; i<list.size(); i++) {
+        if (list[i].size() > 0) std::cout << i << ':';
+        for (const auto& [n,dir] : list[i])
+            std::cout << static_cast<int>(n) << '(' << dir << "), ";
+        if (list[i].size() > 0) std::cout << "\n";
+    }
+}
+
 void Generator::generate() {
     std::vector<std::vector<int8_t>> board(N, std::vector<int8_t>(cols, -1));
     std::vector<std::pair<uint8_t, uint8_t>> border_cells;
@@ -26,11 +35,14 @@ void Generator::generate() {
     board[N-2][N-2] = counter++;  // 2
 
     used[1] = true;
+    border_cells.emplace_back(N-2, N-2);
     nextStep(board, border_cells, adj_list, used, N-1, N-1, counter, max_used);
     depth--;
 
     used[2] = true;
     used[1] = false;
+    border_cells[0].first = N-1;
+    border_cells[0].second = N-1;
     nextStep(board, border_cells, adj_list, used, N-2, N-2, counter, max_used);
     depth--;
 }
@@ -38,8 +50,8 @@ void Generator::generate() {
 void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
                          const std::vector<std::pair<uint8_t, uint8_t>>& available_cells,
                          const std::vector<std::vector<std::pair<uint8_t, char>>>& old_adj_list,
-                         const std::vector<bool>& old_used,
-                         const uint8_t added_i, const uint8_t added_j, const uint8_t old_counter, const uint8_t old_max_used) {
+                         const std::vector<bool>& old_used, const uint8_t added_i, const uint8_t added_j,
+                         const uint8_t old_counter, const uint8_t old_max_used) {
     std::vector<std::vector<int8_t>> board(old_board);
     std::vector<std::pair<uint8_t, uint8_t>> border_cells(available_cells);
     std::vector<std::vector<std::pair<uint8_t, char>>> adj_list(old_adj_list);
@@ -47,25 +59,27 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
     uint8_t counter = old_counter;
     uint8_t max_used = old_max_used;
     depth++;
-    std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << ", cnt=" << static_cast<int>(counter) << std::endl;
 
-    //cos nie dziala - powtorki
     chooseCell(adj_list, used, added_i, added_j, board);
     max_used = board[added_i][added_j];
     used[board[added_i][added_j]] = true;
     addNewBorderCells(board, border_cells, added_i, added_j, counter);
     updateAvailableBorderCells(border_cells, board, max_used);
 
+    std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << std::endl; //", cnt=" << static_cast<int>(counter) << std::endl;
     for (uint8_t i=0; i<N; i++) {
-        for (uint8_t j=0; j<cols; j++) 
+        for (uint8_t j=0; j<cols; j++)
             std::cout << static_cast<int>(board[i][j]) << ' ';
         std::cout << std::endl;
     }
-
-    std::cout << "used: ";
+    std::cout << "border cells: ";
+    for (auto& [i,j] : border_cells)
+        std::cout << static_cast<int>(board[i][j]) << ' '; // "(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ") ";
+    std::cout << "\nused: ";
     for (size_t i = 0; i < used.size(); i++)
         if (used[i]) std::cout << i << ' ';
-    std::cout << "\nmax used=" << static_cast<int>(max_used) << std::endl;
+    std::cout << "\n";
+    printAdj(adj_list);
 
     if (depth < N) {  // <= ?
         for (const auto& [i, j] : border_cells) {
@@ -97,25 +111,23 @@ void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
 void Generator::updateAvailableBorderCells(std::vector<std::pair<uint8_t, uint8_t>>& cells, 
                                            const std::vector<std::vector<int8_t>>& board, const uint8_t max_used) {
     cells.erase(std::remove_if(cells.begin(), cells.end(), [&](const std::pair<int, int>& p) {
-        return board[p.first][p.second] < max_used;
+        return board[p.first][p.second] <= max_used;
     }), cells.end());
 }
 
 void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, const std::vector<bool>& used,
                            const uint8_t i, const uint8_t j, const std::vector<std::vector<int8_t>>& board) {
     // find used nbh and add to the list
-    std::cout << "chooseCell | i=" << static_cast<int>(i) << " j=" << static_cast<int>(j) << std::endl;
-    
     if (isInBounds(i,j-1) && board[i][j-1] != -1 && used[board[i][j-1]]) {  // ->
-        if (board[i][j-1] >= adj_list.size())
+        if (static_cast<size_t>(board[i][j-1]) >= adj_list.size())
             resizeList(adj_list, board[i][j-1]);
         adj_list[board[i][j-1]].emplace_back(board[i][j], '0');
     } else if (isInBounds(i,j+1) && board[i][j+1] != -1 && used[board[i][j+1]]) {  // <-
-        if (board[i][j+1] >= adj_list.size())
+        if (static_cast<size_t>(board[i][j+1]) >= adj_list.size())
             resizeList(adj_list, board[i][j+1]);
         adj_list[board[i][j+1]].emplace_back(board[i][j], '2');
     } else {  // ^
-        if (board[i+1][j] >= adj_list.size())
+        if (static_cast<size_t>(board[i+1][j]) >= adj_list.size())
             resizeList(adj_list, board[i+1][j]);
         adj_list[board[i+1][j]].emplace_back(board[i][j], '1');
     }
