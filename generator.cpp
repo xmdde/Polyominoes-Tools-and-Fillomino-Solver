@@ -5,11 +5,7 @@
 #include <utility>
 #include <cstdint>
 
-void resizeList(std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, uint8_t idx) {
-    while (idx >= adj_list.size()) {
-        adj_list.push_back(std::vector<std::pair<uint8_t, char>>());
-    }
-}
+#include "utils.h"
 
 void printAdj(const std::vector<std::vector<std::pair<uint8_t, char>>>& list) {
     for (size_t i=0; i<list.size(); i++) {
@@ -23,7 +19,7 @@ void printAdj(const std::vector<std::vector<std::pair<uint8_t, char>>>& list) {
 void Generator::generate() {
     std::vector<std::vector<int8_t>> board(N, std::vector<int8_t>(cols, -1));
     std::vector<std::pair<uint8_t, uint8_t>> border_cells;
-    std::vector<std::vector<std::pair<uint8_t, char>>> adj_list; // jak z rozmiarem?
+    std::vector<std::vector<std::pair<uint8_t, char>>> adj_list;
     std::vector<bool> used(N*cols, false);
 
     uint8_t counter = 0;
@@ -66,7 +62,7 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
     addNewBorderCells(board, border_cells, added_i, added_j, counter);
     updateAvailableBorderCells(border_cells, board, max_used);
 
-    std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << std::endl; //", cnt=" << static_cast<int>(counter) << std::endl;
+    std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << std::endl;
     for (uint8_t i=0; i<N; i++) {
         for (uint8_t j=0; j<cols; j++)
             std::cout << static_cast<int>(board[i][j]) << ' ';
@@ -93,7 +89,7 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
 // board[i][j] - new cell
 void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
                                   std::vector<std::pair<uint8_t, uint8_t>>& border_cells,
-                                  const uint8_t i, const uint8_t j, uint8_t& counter) {
+                                  const uint8_t i, const uint8_t j, uint8_t& counter) const {
     if (isInBounds(i,j-1) && board[i][j-1] == -1) {
         board[i][j-1] = counter++;
         border_cells.emplace_back(i,j-1);
@@ -109,7 +105,7 @@ void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
 }
 
 void Generator::updateAvailableBorderCells(std::vector<std::pair<uint8_t, uint8_t>>& cells, 
-                                           const std::vector<std::vector<int8_t>>& board, const uint8_t max_used) {
+                                           const std::vector<std::vector<int8_t>>& board, const uint8_t max_used) const {
     cells.erase(std::remove_if(cells.begin(), cells.end(), [&](const std::pair<int, int>& p) {
         return board[p.first][p.second] <= max_used;
     }), cells.end());
@@ -133,6 +129,6 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
     }
 }
 
-bool Generator::isInBounds(const uint8_t i, const uint8_t j) const {
+bool Generator::isInBounds(const int8_t i, const int8_t j) const {
     return i >= 0 && i < N && j >= 0 && j < cols;
 }
