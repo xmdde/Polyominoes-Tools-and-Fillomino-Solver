@@ -8,7 +8,7 @@
 #include "utils.h"
 
 void printAdj(const std::vector<std::vector<std::pair<uint8_t, char>>>& list) {
-    for (size_t i=0; i<list.size(); i++) {
+    for (size_t i=0; i < list.size(); i++) {
         if (list[i].size() > 0) std::cout << i << ':';
         for (const auto& [n,dir] : list[i])
             std::cout << static_cast<int>(n) << '(' << dir << "), ";
@@ -68,14 +68,13 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
             std::cout << static_cast<int>(board[i][j]) << ' ';
         std::cout << std::endl;
     }
-    std::cout << "border cells: ";
-    for (auto& [i,j] : border_cells)
-        std::cout << static_cast<int>(board[i][j]) << ' '; // "(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ") ";
     std::cout << "\nused: ";
     for (size_t i = 0; i < used.size(); i++)
         if (used[i]) std::cout << i << ' ';
     std::cout << "\n";
     printAdj(adj_list);
+    std::string code = "";
+    generatePolyominoCode(code, adj_list);
 
     if (depth < N) {  // <= ?
         for (const auto& [i, j] : border_cells) {
@@ -127,6 +126,43 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
             resizeList(adj_list, board[i+1][j]);
         adj_list[board[i+1][j]].emplace_back(board[i][j], '1');
     }
+}
+
+void Generator::dfs(std::string& polyomino, std::vector<bool>& used, size_t& visited, const size_t to_visit,
+                    const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, const uint8_t curr) const {
+    // to bedzie mozna szybciej tylko sprawdz -> depth - 1 = to_visit
+    for (const auto& [n,dir] : adj_list[curr]) {
+        if (!used[n] && visited < to_visit) {  // ? is the 1. necessary
+            polyomino += dir;
+            used[n] = true;
+            visited++;
+            dfs(polyomino, used, visited, to_visit, adj_list, n);
+            if (visited < to_visit) { //
+                polyomino += getOppositeDir(dir);
+            }
+        }
+    }
+}
+
+void Generator::generatePolyominoCode(std::string& polyomino, const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list) const {
+    size_t to_visit = 0;
+    size_t visited = 0;
+    for (const auto& v : adj_list)
+        to_visit += v.size();
+    std::vector<bool> used(adj_list.size(), false);
+    used[0] = true;
+    polyomino = "x";
+    dfs(polyomino, used, visited, to_visit, adj_list, 0);
+
+    std::cout << to_visit << '(' << static_cast<int>(depth) << "): " << polyomino << std::endl;
+}
+
+char Generator::getDirection(const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list,
+                             const uint8_t parent, const uint8_t child) const {
+    for (const auto& [n,dir] : adj_list[parent])
+        if (n == child)
+            return dir;
+    return ' ';
 }
 
 bool Generator::isInBounds(const int8_t i, const int8_t j) const {
