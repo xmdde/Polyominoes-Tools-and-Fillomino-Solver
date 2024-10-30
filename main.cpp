@@ -9,7 +9,7 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    Generator gen(3);
+    Generator gen(8, "boards/codes.txt");
     gen.generate();
     // Fillomino f(argv[1]);
     // f.print();

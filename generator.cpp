@@ -1,6 +1,8 @@
 #include "generator.h"
 
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 #include <vector>
 #include <utility>
 #include <cstdint>
@@ -65,16 +67,16 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
     std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << std::endl;
     for (uint8_t i=0; i<N; i++) {
         for (uint8_t j=0; j<cols; j++)
-            std::cout << static_cast<int>(board[i][j]) << ' ';
-        std::cout << std::endl;
+            std::cout << std::setw(2) << static_cast<int>(board[i][j]) << ' ';
+        std::cout << '\n';
     }
-    std::cout << "\nused: ";
+    std::cout << "used: ";
     for (size_t i = 0; i < used.size(); i++)
         if (used[i]) std::cout << i << ' ';
-    std::cout << "\n";
+    std::cout << '\n';
     printAdj(adj_list);
     std::string code = "";
-    generatePolyominoCode(code, adj_list);
+    generatePolyominoCodes(code, adj_list);
 
     if (depth < N) {  // <= ?
         for (const auto& [i, j] : border_cells) {
@@ -128,41 +130,61 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
     }
 }
 
-void Generator::dfs(std::string& polyomino, std::vector<bool>& used, size_t& visited, const size_t to_visit,
+void Generator::dfs(std::string& polyomino, std::vector<bool>& used, size_t& visited,
                     const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, const uint8_t curr) const {
-    // to bedzie mozna szybciej tylko sprawdz -> depth - 1 = to_visit
+    /*
+    std::cout << "polyomino: " << &polyomino << '\n';
+    std::cout << "used: " << &used << '\n';
+    std::cout << "visited: " << &visited << '\n';
+    std::cout << "adj_list: " << &adj_list << '\n';
+    std::cout << "depth: " << &depth << '\n';
+    std::cout << "this: " << this << '\n';
+    std::cout << "curr: " << static_cast<int>(curr) << ", adj_list.size(): " << adj_list.size() << '\n';
+    */
+    if (curr >= adj_list.size()) return;
+
     for (const auto& [n,dir] : adj_list[curr]) {
-        if (!used[n] && visited < to_visit) {  // ? is the 1. necessary
+        if (!used[n] && visited < depth - 1) {  // ? is the 1. necessary
             polyomino += dir;
             used[n] = true;
             visited++;
-            dfs(polyomino, used, visited, to_visit, adj_list, n);
-            if (visited < to_visit) { //
+            dfs(polyomino, used, visited, adj_list, n);
+            if (visited < depth - 1) {
                 polyomino += getOppositeDir(dir);
             }
         }
     }
 }
 
-void Generator::generatePolyominoCode(std::string& polyomino, const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list) const {
-    size_t to_visit = 0;
+void Generator::generatePolyominoCodes(std::string& polyomino, const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list) {
     size_t visited = 0;
-    for (const auto& v : adj_list)
-        to_visit += v.size();
     std::vector<bool> used(adj_list.size(), false);
     used[0] = true;
     polyomino = "x";
-    dfs(polyomino, used, visited, to_visit, adj_list, 0);
-
-    std::cout << to_visit << '(' << static_cast<int>(depth) << "): " << polyomino << std::endl;
+    dfs(polyomino, used, visited, adj_list, 0);
+    generateAllOptions(polyomino);
 }
 
-char Generator::getDirection(const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list,
-                             const uint8_t parent, const uint8_t child) const {
-    for (const auto& [n,dir] : adj_list[parent])
-        if (n == child)
-            return dir;
-    return ' ';
+void Generator::generateAllOptions(const std::string& code) {
+    std::vector<std::string> polyominoes;
+    polyominoes.push_back(code);
+    std::string s1 = "";
+    std::string s2 = code.substr(1);
+
+    while (s2 != "") {
+        s1 += getOppositeDir(s2[0]);
+        s2 = s2.substr(1);
+        if (s1 == s2.substr(0, s1.length())) {
+            s1 = "";
+            polyominoes.clear();
+        }
+        polyominoes.push_back(s1 + "x" + s2);
+    }
+
+    for (const auto& p : polyominoes) {
+        std::cout << p << '\n';
+        file << static_cast<int>(depth) << ' ' << p << '\n';
+    }
 }
 
 bool Generator::isInBounds(const int8_t i, const int8_t j) const {
