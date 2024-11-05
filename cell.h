@@ -23,7 +23,7 @@ public:
         return num;
     }
 
-    void setGroupSize(const uint8_t size) { // pomysl co z 0
+    void setGroupSize(const uint8_t size) {  // pomysl co z 0 + throw
         group_size = size;
         if (group_size == num)
             finished = true;
@@ -33,7 +33,7 @@ public:
         return group_size;
     }
 
-    void updateGroupSize(const uint8_t delta) {
+    void updateGroupSize(const uint8_t delta) {  // ?
         group_size += delta;
         if (group_size == num)
             finished = true;
