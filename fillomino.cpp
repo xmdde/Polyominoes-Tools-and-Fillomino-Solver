@@ -5,7 +5,11 @@
 #include <string>
 #include <vector>
 
-uint8_t Fillomino::getPartialSize(const uint8_t i, const uint8_t j) const { // dodaj inne wspolrzedne?
+bool Fillomino::isInBounds(const uint8_t i, const uint8_t j) const {
+    return i >= 0 && i < rows && j >= 0 && j < cols;
+}
+
+uint8_t Fillomino::getPartialSize(const uint8_t i, const uint8_t j) const {  // dodaj inne wspolrzedne?
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
     uint8_t size = 1;
@@ -65,36 +69,32 @@ void Fillomino::getBoardFromFile(const std::string& file) {
     }
 }
 
-bool Fillomino::isInBounds(const uint8_t i, const uint8_t j) const {
-    return i >= 0 && i < rows && j >= 0 && j < cols;
-}
-
 // to check + puste/unfinished pole odciete
 bool Fillomino::isValid() const { 
-    for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < cols; j++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             if (board[i][j].getNum() == 0) {
                 if (isCellBlocked(board, i, j))
                     return false;
-                break;
+            } else {
+                if (isInBounds(i,j+1) && board[i][j] == board[i][j+1] && board[i][j].finished != board[i][j+1].finished)
+                    return false;
+                if (isInBounds(i+1,j) && board[i][j] == board[i+1][j] && board[i][j].finished != board[i+1][j].finished)
+                    return false;
             }
-            if (isInBounds(i,j+1) && board[i][j] == board[i][j+1] && board[i][j].finished != board[i][j+1].finished)
-                return false;
-            if (isInBounds(i+1,j) && board[i][j] == board[i+1][j] && board[i][j].finished != board[i+1][j].finished)
-                return false;
         }
     }
     return true;
 }
 
+// dodaj sprawdzanie czy na pewno nie stykaja sie dwa rozne polyomino tego samego rozmiaru - dodaj vec...
 bool Fillomino::isValid(const std::vector<std::vector<Cell>>& b) const {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             if (b[i][j].getNum() == 0) {
-                if (isCellBlocked(b, i, j)) {
+                if (isCellBlocked(b, i, j))
                     return false;
-                }
-            } else {
+            } else { // ? nie wiadomo czy potrzebne
                 if (isInBounds(i,j+1) && b[i][j] == b[i][j+1] && b[i][j].finished != b[i][j+1].finished)
                     return false;
                 if (isInBounds(i+1,j) && b[i][j] == b[i+1][j] && b[i][j].finished != b[i+1][j].finished)
@@ -105,8 +105,16 @@ bool Fillomino::isValid(const std::vector<std::vector<Cell>>& b) const {
     return true;
 }
 
-bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_idx) const {  // +vec
+bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_idx, std::vector<std::vector<Cell>>& b) const {  // +vec
     std::vector<std::vector<Cell>> boardCopy = board;
+    std::cout << "processCode:\n";
+    for (int x = 0; x < rows; x++) {
+        for (int y = 0; y < cols; y++) {
+            std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
+        }
+        std::cout << std::endl;
+    }
+
     boardCopy[i_idx][j_idx].finished = true;
     const uint8_t n = board[i_idx][j_idx].getNum();
     const size_t pos = code.find('x');
@@ -121,9 +129,8 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
         getNewCoords(new_i, new_j, i, j, sub1[idx]);
         // std::cout << '(' << static_cast<int>(new_i) << ',' << static_cast<int>(new_j) << "), ";
         // moze zmiana warunku po prostu?
-        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0) || board[new_i][new_j].finished) { // || empty
+        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0) || board[new_i][new_j].finished)
             return false;
-        }
 
         boardCopy[new_i][new_j].setNum(n);
         boardCopy[new_i][new_j].finished = true;
@@ -148,7 +155,21 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
         i = new_i;
         j = new_j;
     }
-    return isValid(boardCopy);
+
+    if (getPartialSize(i_idx, j_idx) > n)
+        return false;
+
+    b = boardCopy;
+    std::cout << "end of processCode:\n";
+    for (int x = 0; x < rows; x++) {
+        for (int y = 0; y < cols; y++) {
+            std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
+        }
+        std::cout << std::endl;
+    }
+    bool v = isValid(boardCopy);
+    std::cout << "v=" << v << '\n';
+    return v;
 }
 
 // returns true if cell is unfinished and all neighbours are finished (+min. one neighbour is 1)
@@ -162,6 +183,23 @@ bool Fillomino::isCellBlocked(const std::vector<std::vector<Cell>>& b, const uin
     return false;
 }
 
+bool Fillomino::isCellAClue(const uint8_t i, const uint8_t j) const {
+    return board[i][j].getNum() != 0 && !board[i][j].finished;
+}
+
+bool Fillomino::isSolved() const {
+    for (uint8_t i = 0; i < rows; i++) {
+        for (uint8_t j = 0; j < cols; j++)
+            if (!board[i][j].finished)
+                return false;
+    }
+    return true;
+}
+
+uint8_t Fillomino::getNum(const uint8_t i, const uint8_t j) const {
+    return board[i][j].getNum();
+}
+
 void Fillomino::print() const {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -169,7 +207,7 @@ void Fillomino::print() const {
         }
         std::cout << std::endl;
     }
-    std::cout << std::endl;
+    /*std::cout << std::endl;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             std::cout << static_cast<int>(board[i][j].getGroupSize()) << ' ';
@@ -182,5 +220,5 @@ void Fillomino::print() const {
             std::cout << board[i][j].finished << ' ';
         }
         std::cout << std::endl;
-    }
+    }*/
 }

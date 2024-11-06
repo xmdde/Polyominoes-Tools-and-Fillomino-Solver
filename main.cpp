@@ -17,8 +17,8 @@ int main(int argc, const char* argv[]) {
     std::cout << f.isValid() << std::endl;
     std::cout << f.processCode("3x2", 0, 2);
 */
-    // f.print();
     Solver solver("boards/codes.txt");
-    solver.tescik();
+    solver.solve();
+    //solver.tescik();
     return 0;
 }

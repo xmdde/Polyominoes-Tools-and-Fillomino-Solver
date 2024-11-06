@@ -20,18 +20,20 @@ class Fillomino {
                             const uint8_t j) const;
     bool isInBounds(const uint8_t i, const uint8_t j) const;
     bool isValid(const std::vector<std::vector<Cell>>& b) const;
-    // returns true if cell is unfinished(--) and all neighbours are finished (+min. one neighbour is 1)
     bool isCellBlocked(const std::vector<std::vector<Cell>>& b, const uint8_t i, const uint8_t j) const;
 public:
     Fillomino(const std::string& file) {
         getBoardFromFile(file);
     }
-    // dodaj sprawdzanie poprawnosci zanim stworzymy nowy obiekt
     Fillomino(const Fillomino& other) : rows(other.rows), cols(other.cols), board(other.board) {}
+    Fillomino(const int r, const int c, const std::vector<std::vector<Cell>>& b) : rows(r), cols(c), board(b) {}
 
     void print() const;
     bool isValid() const;
-    bool processCode(const std::string& code, const uint8_t i, const uint8_t j) const;
+    bool isSolved() const;
+    bool processCode(const std::string& code, const uint8_t i, const uint8_t j, std::vector<std::vector<Cell>>& b) const;
+    bool isCellAClue(const uint8_t i, const uint8_t j) const;
+    uint8_t getNum(const uint8_t i, const uint8_t j) const;
 };
 
 #endif  // POLYOMINOES_FILLOMINO_H

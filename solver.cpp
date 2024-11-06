@@ -1,5 +1,12 @@
 #include "solver.h"
-
+/*
+void Solver::tescik() const {
+    for (const auto& code : polyominoes[4]) {
+        if (fillomino.processCode(code, 1, 0))
+            std::cout << code << ' ';
+    }
+}
+*/
 void Solver::getGeneratedPolyominoes(const std::string& filename) {
     polyominoes.resize(9);
     
@@ -16,9 +23,72 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
     file.close();
 }
 
-void Solver::tescik() const {
-    for (const auto& code : polyominoes[3]) {
-        if (fillomino.processCode(code, 0, 2))
-            std::cout << code << ' ';
+void Solver::solve() {
+    const int rows = 4;
+    const int cols = 4;
+    bool solved = false;
+
+    for (uint8_t i = 0; i < rows; i++) {
+        for (uint8_t j = 0; j < cols; j++) {
+            if (fillomino.isCellAClue(i,j)) {
+                const uint8_t n = fillomino.getNum(i,j);
+                for (const auto& polyomino : polyominoes[n]) {
+                    std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
+                    std::vector<std::vector<Cell>> board;
+                    if (fillomino.processCode(polyomino,i,j,board)) {
+                        solved = next_step(i,j,board);
+                        if (solved) {
+                            std::cout << "udalo sie!\n";
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
+}
+
+bool Solver::next_step(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
+    std::cout << "next_step(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ")\n";
+    const uint8_t rows = 4;
+    const uint8_t cols = 4;
+
+    Fillomino f(rows, cols, b);
+    std::cout << "na poczatku:\n";
+    f.print();
+
+    bool solved = f.isSolved();  // na teraz
+    if (solved) {
+        std::cout << "normalnie rozwiazane 1\n";
+        f.print();
+        return true;
+    }
+
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < cols; j++) {
+            //std::cout << "i,j: " << static_cast<int>(i) << ',' << static_cast<int>(j) << "\n";
+            if (f.isCellAClue(i,j)) {
+                const uint8_t n = f.getNum(i,j);
+                for (const auto& polyomino : polyominoes[n]) {
+                    std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
+                    std::vector<std::vector<Cell>> board;
+                    std::cout << static_cast<int>(i) << ',' << static_cast<int>(j) << '\n';
+                    if (f.processCode(polyomino, i, j, board)) {
+                        solved = next_step(i, j, board);
+
+                        if (!solved) {
+                            continue;
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+
+    bool s = f.isSolved();
+    std::cout << "poza petla s=" << s << "\n";
+    //f.print();
+    return s;
 }

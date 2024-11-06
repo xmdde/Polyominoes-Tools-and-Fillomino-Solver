@@ -13,11 +13,14 @@ class Solver {
     Fillomino fillomino;
 
     void getGeneratedPolyominoes(const std::string& filename);
+    bool next_step(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const;
+
 public:
-    Solver(const std::string& file) : fillomino("boards/1.txt"){
+    Solver(const std::string& file) : fillomino("boards/3.txt") {
         getGeneratedPolyominoes(file);
     }
 
+    void solve();
     void tescik() const;
 };
 
