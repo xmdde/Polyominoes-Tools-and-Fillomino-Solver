@@ -13,31 +13,39 @@ uint8_t Fillomino::getPartialSize(const uint8_t i, const uint8_t j) const {  // 
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
     uint8_t size = 1;
-    getPartialSizeHelp(size, used, i, j);
+    getPartialSizeHelp(board, size, used, i, j);
     return size;
 }
 
-void Fillomino::getPartialSizeHelp(uint8_t& size, std::vector<std::vector<bool>>& used, const uint8_t i,
-                                   const uint8_t j) const {
-    if (isInBounds(i-1, j) && !used[i-1][j] && board[i-1][j] == board[i][j]) { // ^
+uint8_t Fillomino::getPartialSize(const std::vector<std::vector<Cell>>& b, const uint8_t i, const uint8_t j) const {
+    std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
+    used[i][j] = true;
+    uint8_t size = 1;
+    getPartialSizeHelp(b, size, used, i, j);
+    return size;
+}
+
+void Fillomino::getPartialSizeHelp(const std::vector<std::vector<Cell>>& b, uint8_t& size, std::vector<std::vector<bool>>& used,
+                                   const uint8_t i, const uint8_t j) const {
+    if (isInBounds(i-1, j) && !used[i-1][j] && b[i-1][j] == b[i][j]) { // ^
         size++;
         used[i-1][j] = true;
-        getPartialSizeHelp(size, used, i-1, j);
+        getPartialSizeHelp(b, size, used, i-1, j);
     }
-    if (isInBounds(i, j+1) && !used[i][j+1] && board[i][j+1] == board[i][j]) { // >
+    if (isInBounds(i, j+1) && !used[i][j+1] && b[i][j+1] == b[i][j]) { // >
         size++;
         used[i][j+1] = true;
-        getPartialSizeHelp(size, used, i, j+1);
+        getPartialSizeHelp(b, size, used, i, j+1);
     }
-    if (isInBounds(i+1, j) && !used[i+1][j] && board[i+1][j] == board[i][j]) { // d
+    if (isInBounds(i+1, j) && !used[i+1][j] && b[i+1][j] == b[i][j]) { // d
         size++;
         used[i+1][j] = true;
-        getPartialSizeHelp(size, used, i+1, j);
+        getPartialSizeHelp(b, size, used, i+1, j);
     }
-    if (isInBounds(i, j-1) && !used[i][j-1] && board[i][j-1] == board[i][j]) { // <
+    if (isInBounds(i, j-1) && !used[i][j-1] && b[i][j-1] == b[i][j]) { // <
         size++;
         used[i][j-1] = true;
-        getPartialSizeHelp(size, used, i, j-1);
+        getPartialSizeHelp(b, size, used, i, j-1);
     }
 }
 
@@ -107,13 +115,13 @@ bool Fillomino::isValid(const std::vector<std::vector<Cell>>& b) const {
 
 bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_idx, std::vector<std::vector<Cell>>& b) const {  // +vec
     std::vector<std::vector<Cell>> boardCopy = board;
-    std::cout << "processCode:\n";
+    /*std::cout << "processCode:\n";
     for (int x = 0; x < rows; x++) {
         for (int y = 0; y < cols; y++) {
             std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
         }
         std::cout << std::endl;
-    }
+    }*/
 
     boardCopy[i_idx][j_idx].finished = true;
     const uint8_t n = board[i_idx][j_idx].getNum();
@@ -156,19 +164,18 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
         j = new_j;
     }
 
-    if (getPartialSize(i_idx, j_idx) > n)
+    if (getPartialSize(boardCopy, i_idx, j_idx) > n)
         return false;
 
     b = boardCopy;
-    std::cout << "end of processCode:\n";
+    /*std::cout << "end of processCode:\n";
     for (int x = 0; x < rows; x++) {
         for (int y = 0; y < cols; y++) {
             std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
         }
         std::cout << std::endl;
-    }
+    }*/
     bool v = isValid(boardCopy);
-    std::cout << "v=" << v << '\n';
     return v;
 }
 

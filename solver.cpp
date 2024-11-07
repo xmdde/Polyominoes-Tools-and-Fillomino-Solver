@@ -24,8 +24,6 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
 }
 
 void Solver::solve() {
-    const int rows = 4;
-    const int cols = 4;
     bool solved = false;
 
     for (uint8_t i = 0; i < rows; i++) {
@@ -33,7 +31,7 @@ void Solver::solve() {
             if (fillomino.isCellAClue(i,j)) {
                 const uint8_t n = fillomino.getNum(i,j);
                 for (const auto& polyomino : polyominoes[n]) {
-                    std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
+                    // std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
                     std::vector<std::vector<Cell>> board;
                     if (fillomino.processCode(polyomino,i,j,board)) {
                         solved = next_step(i,j,board);
@@ -50,9 +48,6 @@ void Solver::solve() {
 
 bool Solver::next_step(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
     std::cout << "next_step(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ")\n";
-    const uint8_t rows = 4;
-    const uint8_t cols = 4;
-
     Fillomino f(rows, cols, b);
     std::cout << "na poczatku:\n";
     f.print();
@@ -70,9 +65,9 @@ bool Solver::next_step(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>
             if (f.isCellAClue(i,j)) {
                 const uint8_t n = f.getNum(i,j);
                 for (const auto& polyomino : polyominoes[n]) {
-                    std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
+                    // std::cout << static_cast<int>(n) << ' ' << polyomino << '\n';
                     std::vector<std::vector<Cell>> board;
-                    std::cout << static_cast<int>(i) << ',' << static_cast<int>(j) << '\n';
+                    // std::cout << static_cast<int>(i) << ',' << static_cast<int>(j) << '\n';
                     if (f.processCode(polyomino, i, j, board)) {
                         solved = next_step(i, j, board);
 
