@@ -15,17 +15,18 @@ class Solver {
     int cols;
 
     void getGeneratedPolyominoes(const std::string& filename);
-    bool next_step(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const;
+    bool nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const;
+    bool completeEmptyCells(); // ? void
+    bool nextStepEmpty();
 
 public:
-    Solver(const std::string& file) : fillomino("boards/5.txt") {
+    Solver(const std::string& file, const std::string& board_file) : fillomino(board_file) {
         getGeneratedPolyominoes(file);
         rows = fillomino.getRows();
         cols = fillomino.getCols();
     }
 
     void solve();
-    void tescik() const;
 };
 
 #endif  // POLYOMINOES_SOLVER_H

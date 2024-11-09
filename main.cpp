@@ -10,15 +10,12 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    // Generator gen(8, "boards/codes.txt");
-    // gen.generate();
-/*
+    //Generator gen(8, "boards/codes.txt");
+    //gen.generate();
+
     Fillomino f(argv[1]);
-    std::cout << f.isValid() << std::endl;
-    std::cout << f.processCode("3x2", 0, 2);
-*/
-    Solver solver("boards/codes.txt");
-    solver.solve();
-    //solver.tescik();
+    std::cout << f.isValid();
+    //Solver solver("boards/codes.txt", argv[1]);
+    //solver.solve();
     return 0;
 }

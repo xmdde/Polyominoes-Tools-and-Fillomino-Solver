@@ -168,13 +168,14 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
         return false;
 
     b = boardCopy;
-    /*std::cout << "end of processCode:\n";
+
     for (int x = 0; x < rows; x++) {
         for (int y = 0; y < cols; y++) {
             std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
         }
-        std::cout << std::endl;
-    }*/
+        std::cout << "\n";
+    }
+    std::cout << "\n";
     bool v = isValid(boardCopy);
     return v;
 }

@@ -91,6 +91,10 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
 void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
                                   std::vector<std::pair<uint8_t, uint8_t>>& border_cells,
                                   const uint8_t i, const uint8_t j, uint8_t& counter) const {
+    if (isInBounds(i+1,j) && board[i+1][j] == -1) {
+        board[i+1][j] = counter++;
+        border_cells.emplace_back(i+1,j);
+    } // check
     if (isInBounds(i,j-1) && board[i][j-1] == -1) {
         board[i][j-1] = counter++;
         border_cells.emplace_back(i,j-1);
@@ -123,10 +127,14 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
         if (static_cast<size_t>(board[i][j+1]) >= adj_list.size())
             resizeList(adj_list, board[i][j+1]);
         adj_list[board[i][j+1]].emplace_back(board[i][j], '2');
-    } else {  // ^
+    } else if (isInBounds(i+1,j) && board[i+1][j] != -1 && used[board[i+1][j]]) {  // ^
         if (static_cast<size_t>(board[i+1][j]) >= adj_list.size())
             resizeList(adj_list, board[i+1][j]);
         adj_list[board[i+1][j]].emplace_back(board[i][j], '1');
+    } else { // down
+        if (static_cast<size_t>(board[i-1][j]) >= adj_list.size())
+            resizeList(adj_list, board[i-1][j]);
+        adj_list[board[i-1][j]].emplace_back(board[i][j], '3');
     }
 }
 
