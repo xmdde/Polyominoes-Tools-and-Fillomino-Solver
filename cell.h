@@ -25,7 +25,7 @@ public:
 
     void setGroupSize(const uint8_t size) {  // pomysl co z 0 + throw
         group_size = size;
-        if (group_size == num)
+        if (group_size == num && num != 0)
             finished = true;
     }
 
@@ -33,22 +33,12 @@ public:
         return group_size;
     }
 
+    /*
     void updateGroupSize(const uint8_t delta) {  // ?
         group_size += delta;
         if (group_size == num)
             finished = true;
-    }
+    }*/
 };
-
-/*
-to raczej odpada
-struct Compare {
-    bool operator()(const Cell& c1, const Cell& c2) {
-        return c1.value < c2.value;
-    } // zmiana na std::pair<> ? bez cell -> move to fillomino 
-};
-
-std::priority_queue<A, std::vector<A>, Compare> pq; -> std::pair, std::vector<std::pair<uint8_t, uint8_t>>
-*/
 
 #endif  // POLYOMINOES_CELL_H

@@ -41,10 +41,12 @@ void Solver::solve() {
 bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
     //std::cout << "next_step(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ")\n";
     Fillomino f(rows, cols, b);
+    // f.print();
+    // std::cout << '\n';
 
     bool solved = f.isSolved();  // na teraz
     if (solved) {
-        std::cout << "normalnie rozwiazane 1\n";
+        std::cout << "normalnie rozwiazane\n";
         f.print();
         return true;
     }

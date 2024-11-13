@@ -13,9 +13,10 @@ int main(int argc, const char* argv[]) {
     //Generator gen(8, "boards/codes.txt");
     //gen.generate();
 
-    Fillomino f(argv[1]);
-    std::cout << f.isValid();
-    //Solver solver("boards/codes.txt", argv[1]);
-    //solver.solve();
+    //Fillomino f(argv[1]);
+    //f.print();
+    //std::cout << f.isValid() << '\n';
+    Solver solver("boards/codes.txt", argv[1]);
+    solver.solve();
     return 0;
 }
