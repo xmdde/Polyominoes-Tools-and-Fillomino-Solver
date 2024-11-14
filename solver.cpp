@@ -1,5 +1,14 @@
 #include "solver.h"
 
+void Solver::test() {
+    fillomino.print();
+    for (uint8_t i = 0; i < rows; i++)
+        for (uint8_t j = 0; j < cols; j++)
+            if (fillomino.isCellAClue(i,j))
+                fillomino.crossSection(polyominoes,i,j);
+    fillomino.print();
+}
+
 void Solver::getGeneratedPolyominoes(const std::string& filename) {
     polyominoes.resize(9);
     
@@ -18,6 +27,12 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
 
 void Solver::solve() {
     bool solved = false;
+    fillomino.completeOneOption();
+    for (uint8_t i = 0; i < rows; i++)
+        for (uint8_t j = 0; j < cols; j++)
+            if (fillomino.isCellAClue(i,j))
+                fillomino.crossSection(polyominoes,i,j);
+    //fillomino.print();
 
     for (uint8_t i = 0; i < rows; i++) {
         for (uint8_t j = 0; j < cols; j++) {
@@ -41,6 +56,7 @@ void Solver::solve() {
 bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
     //std::cout << "next_step(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ")\n";
     Fillomino f(rows, cols, b);
+    f.completeOneOption();
     // f.print();
     // std::cout << '\n';
 

@@ -272,15 +272,138 @@ void Fillomino::getSurroundingCells(const std::vector<std::pair<int, int>>& poly
             }
         }
     }
-    /*
-    std::cout << "Otaczające komórki:" << std::endl;
-    for (const auto& cell : surr) {
-        std::cout << "(" << cell.first << ", " << cell.second << ")" << std::endl;
-    }*/
 }
 
 bool Fillomino::isCellAClue(const uint8_t i, const uint8_t j) const {
     return board[i][j].getNum() != 0 && !board[i][j].finished;
+}
+
+void Fillomino::completeOneWayOfGrowth() {
+}
+
+bool Fillomino::oneWayOfGrowth(uint8_t& n, const uint8_t i, const uint8_t j) const {
+}
+
+void Fillomino::completeOneOption() {
+    uint8_t n;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (board[i][j].getNum() == 0 && oneOption(n,i,j)) {
+                board[i][j].setNum(n);
+                std::vector<std::pair<uint8_t, uint8_t>> area;
+                uint8_t size = getPartialSize(i, j, area);
+                for (const auto& [r,c] : area)
+                    board[r][c].setGroupSize(size);
+            }
+        }
+    }
+}
+
+bool Fillomino::oneOption(uint8_t& n, const uint8_t i, const uint8_t j) const {
+    std::set<uint8_t> nbh;
+    bool onePresent = false;
+    const std::vector<std::pair<int, int>>& directions = {
+        {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+    };
+
+    for (const auto& dir : directions) {
+        if (isInBounds(i+dir.first, j+dir.second)) {
+            if (board[i + dir.first][j + dir.second].getNum() == 0)
+                return false;
+            if (board[i + dir.first][j + dir.second].getNum() == 1)
+                onePresent = true;
+            else if (!board[i + dir.first][j + dir.second].finished)
+                nbh.insert(board[i + dir.first][j + dir.second].getNum());
+        }
+    }
+
+    if (onePresent && nbh.size() == 1) {
+        const uint8_t num = *nbh.begin();
+        n = num;
+        return true;
+    }
+    return false;
+}
+
+void Fillomino::certainCells(const std::vector<std::vector<std::string>>& codes) {
+    std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
+    // jak bez powtarzania?
+}
+
+void Fillomino::crossSection(const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j) {
+    std::vector<std::vector<uint8_t>> checked(rows, std::vector<uint8_t>(cols, 0));
+    uint8_t cnt = 0;
+    for (const auto& code : codes[board[i][j].getNum()]) {
+        std::set<std::pair<uint8_t,uint8_t>> s;
+        if (processCodeCrossSection(code, i, j, s)) {
+            cnt++;
+            for (const auto& p : s)
+                checked[p.first][p.second]++;
+        }
+    }
+    for (int k = 0; k < rows; k++) {
+        for (int l = 0; l < cols; l++) {
+            if (checked[k][l] == cnt)
+                board[k][l] = board[i][j].getNum();
+        }
+    }
+    std::vector<std::pair<uint8_t, uint8_t>> area;
+    uint8_t size = getPartialSize(i, j, area);
+    for (const auto& [r,c] : area)
+        board[r][c].setGroupSize(size);
+}
+
+bool Fillomino::processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::set<std::pair<uint8_t,uint8_t>>& s) const {
+    std::vector<std::vector<Cell>> boardCopy = board;
+
+    boardCopy[i_idx][j_idx].finished = true;
+    const uint8_t n = board[i_idx][j_idx].getNum();
+    const size_t pos = code.find('x');
+    std::string sub1 = code.substr(0, pos);
+    std::string sub2 = code.substr(pos + 1);
+
+    uint8_t i = i_idx;
+    uint8_t j = j_idx;
+    uint8_t new_i;
+    uint8_t new_j;
+    for (int idx = sub1.size() - 1; idx >= 0; --idx) {
+        getNewCoords(new_i, new_j, i, j, sub1[idx]);
+
+        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0)
+            || (board[new_i][new_j].finished && !(new_i == i_idx && new_j == j_idx)))
+            return false;
+
+        boardCopy[new_i][new_j].setNum(n);
+        boardCopy[new_i][new_j].finished = true;
+        s.insert({new_i, new_j});
+
+        i = new_i;
+        j = new_j;
+    }
+
+    i = i_idx;
+    j = j_idx;
+
+    for (const auto& c : sub2) {
+        getNewCoords(new_i, new_j, i, j, c);
+
+        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0)
+            || (board[new_i][new_j].finished && !(new_i == i_idx && new_j == j_idx)))
+            return false;
+
+        boardCopy[new_i][new_j].setNum(n);
+        boardCopy[new_i][new_j].finished = true;
+        s.insert({new_i, new_j});
+
+        i = new_i;
+        j = new_j;
+    }
+
+    if (getPartialSize(boardCopy, i_idx, j_idx) > n)
+        return false;
+
+    bool v = isValid(boardCopy);
+    return v;
 }
 
 bool Fillomino::isSolved() const {
@@ -301,20 +424,21 @@ void Fillomino::print() const {
         for (int j = 0; j < cols; j++) {
             std::cout << static_cast<int>(board[i][j].getNum()) << ' ';
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
-    std::cout << std::endl;
-    for (int i = 0; i < rows; i++) {
+    std::cout << "\n";
+    /*for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             std::cout << static_cast<int>(board[i][j].getGroupSize()) << ' ';
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             std::cout << board[i][j].finished << ' ';
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
+    std::cout << "\n";*/
 }

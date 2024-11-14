@@ -27,6 +27,7 @@ public:
     }
 
     void solve();
+    void test();
 };
 
 #endif  // POLYOMINOES_SOLVER_H

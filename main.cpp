@@ -17,6 +17,7 @@ int main(int argc, const char* argv[]) {
     //f.print();
     //std::cout << f.isValid() << '\n';
     Solver solver("boards/codes.txt", argv[1]);
+    //solver.test();
     solver.solve();
     return 0;
 }
