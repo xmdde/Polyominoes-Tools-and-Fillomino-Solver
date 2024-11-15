@@ -167,7 +167,8 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
         getNewCoords(new_i, new_j, i, j, sub1[idx]);
         // std::cout << '(' << static_cast<int>(new_i) << ',' << static_cast<int>(new_j) << "), ";
         // moze zmiana warunku po prostu?
-        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0) || board[new_i][new_j].finished)
+        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0)
+            || (board[new_i][new_j].finished && !(new_i == i_idx && new_j == j_idx)))
             return false;
 
         boardCopy[new_i][new_j].setNum(n);
@@ -183,7 +184,8 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
     for (const auto& c : sub2) {
         getNewCoords(new_i, new_j, i, j, c);
 
-        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0) || board[new_i][new_j].finished)
+        if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0)
+            || (board[new_i][new_j].finished && !(new_i == i_idx && new_j == j_idx)))
             return false;
 
         boardCopy[new_i][new_j].setNum(n);
@@ -328,11 +330,18 @@ bool Fillomino::oneOption(uint8_t& n, const uint8_t i, const uint8_t j) const {
 void Fillomino::certainCells(const std::vector<std::vector<std::string>>& codes) {
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
     // jak bez powtarzania?
+    for (uint8_t i = 0; i < rows; i++)
+        for (uint8_t j = 0; j < cols; j++)
+            if (!checked[i][j] && isCellAClue(i,j)) {
+                checked[i][j] = true;
+                crossSection(checked,codes,i,j);
+            }
 }
 
-void Fillomino::crossSection(const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j) {
+void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j) {
     std::vector<std::vector<uint8_t>> checked(rows, std::vector<uint8_t>(cols, 0));
     uint8_t cnt = 0;
+
     for (const auto& code : codes[board[i][j].getNum()]) {
         std::set<std::pair<uint8_t,uint8_t>> s;
         if (processCodeCrossSection(code, i, j, s)) {
@@ -343,14 +352,18 @@ void Fillomino::crossSection(const std::vector<std::vector<std::string>>& codes,
     }
     for (int k = 0; k < rows; k++) {
         for (int l = 0; l < cols; l++) {
-            if (checked[k][l] == cnt)
+            if (checked[k][l] == cnt) {
                 board[k][l] = board[i][j].getNum();
+                done[k][l] = true;
+            }
         }
     }
     std::vector<std::pair<uint8_t, uint8_t>> area;
     uint8_t size = getPartialSize(i, j, area);
-    for (const auto& [r,c] : area)
+    for (const auto& [r,c] : area) {
         board[r][c].setGroupSize(size);
+        done[r][c] = true;
+    }
 }
 
 bool Fillomino::processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::set<std::pair<uint8_t,uint8_t>>& s) const {

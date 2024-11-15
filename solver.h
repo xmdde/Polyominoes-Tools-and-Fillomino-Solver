@@ -20,12 +20,7 @@ class Solver {
     bool nextStepEmpty();
 
 public:
-    Solver(const std::string& file, const std::string& board_file) : fillomino(board_file) {
-        getGeneratedPolyominoes(file);
-        rows = fillomino.getRows();
-        cols = fillomino.getCols();
-    }
-
+    Solver(const std::string& file, const std::string& board_file);
     void solve();
     void test();
 };

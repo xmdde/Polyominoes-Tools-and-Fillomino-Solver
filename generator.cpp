@@ -64,17 +64,6 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
     addNewBorderCells(board, border_cells, added_i, added_j, counter);
     updateAvailableBorderCells(border_cells, board, max_used);
 
-    std::cout << "------------------------------\ndepth=" << static_cast<int>(depth) << std::endl;
-    for (uint8_t i=0; i<N; i++) {
-        for (uint8_t j=0; j<cols; j++)
-            std::cout << std::setw(2) << static_cast<int>(board[i][j]) << ' ';
-        std::cout << '\n';
-    }
-    std::cout << "used: ";
-    for (size_t i = 0; i < used.size(); i++)
-        if (used[i]) std::cout << i << ' ';
-    std::cout << '\n';
-    printAdj(adj_list);
     std::string code = "";
     generatePolyominoCodes(code, adj_list);
 

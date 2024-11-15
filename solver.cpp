@@ -1,12 +1,16 @@
 #include "solver.h"
 
-void Solver::test() {
-    fillomino.print();
-    for (uint8_t i = 0; i < rows; i++)
-        for (uint8_t j = 0; j < cols; j++)
-            if (fillomino.isCellAClue(i,j))
-                fillomino.crossSection(polyominoes,i,j);
-    fillomino.print();
+#include <chrono>
+
+Solver::Solver(const std::string& file, const std::string& board_file) : fillomino(board_file) {
+    auto start = std::chrono::high_resolution_clock::now();
+    getGeneratedPolyominoes(file);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Czas wykonania: " << duration.count() << "\n";
+
+    rows = fillomino.getRows();
+    cols = fillomino.getCols();
 }
 
 void Solver::getGeneratedPolyominoes(const std::string& filename) {
@@ -28,11 +32,17 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
 void Solver::solve() {
     bool solved = false;
     fillomino.completeOneOption();
-    for (uint8_t i = 0; i < rows; i++)
+    /*
+    for (uint8_t i = 0; i < rows; i++) {
         for (uint8_t j = 0; j < cols; j++)
-            if (fillomino.isCellAClue(i,j))
+            if (fillomino.isCellAClue(i,j)) {
+                std::cout << static_cast<int>(i) << ' ' << static_cast<int>(j) << '\n';
                 fillomino.crossSection(polyominoes,i,j);
-    //fillomino.print();
+                //fillomino.print();
+            }
+    }*/
+
+    fillomino.certainCells(polyominoes);
 
     for (uint8_t i = 0; i < rows; i++) {
         for (uint8_t j = 0; j < cols; j++) {
@@ -54,11 +64,8 @@ void Solver::solve() {
 }
 
 bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
-    //std::cout << "next_step(" << static_cast<int>(i) << ',' << static_cast<int>(j) << ")\n";
     Fillomino f(rows, cols, b);
     f.completeOneOption();
-    // f.print();
-    // std::cout << '\n';
 
     bool solved = f.isSolved();  // na teraz
     if (solved) {

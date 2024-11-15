@@ -13,7 +13,6 @@ class Fillomino {
     int rows;
     int cols;
     static constexpr bool opt = true;
-    // vec of partially finished polyominoes??
 
     void getBoardFromFile(const std::string& file);
     uint8_t getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const;
@@ -29,8 +28,7 @@ class Fillomino {
     bool oneWayOfGrowth(uint8_t& n, uint8_t i, const uint8_t j) const;
     bool oneOption(uint8_t& n, const uint8_t i, const uint8_t j) const;
     bool processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::set<std::pair<uint8_t,uint8_t>>& s) const;
-public:
-    void crossSection(const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j);
+    void crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j);
 public:
     std::vector<std::vector<Cell>> board;
     Fillomino(const std::string& file) {
