@@ -10,13 +10,12 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    //Generator gen(8, "boards/codes.txt");
-    //gen.generate();
-
-    //Fillomino f(argv[1]);
-    //f.print();
-    //std::cout << f.isValid() << '\n';
-    Solver solver("boards/codes.txt", argv[1]);
-    solver.solve();
+    if (argv[1] == "-g") {
+        //Generator gen(9, "boards/codes.txt");
+        //gen.generate();
+    } else {
+        Solver solver("boards/codes.txt", argv[1]);
+        solver.solve();
+    }
     return 0;
 }

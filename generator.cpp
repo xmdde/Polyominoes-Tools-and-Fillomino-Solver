@@ -20,6 +20,9 @@ void printAdj(const std::vector<std::vector<std::pair<uint8_t, char>>>& list) {
 
 void Generator::generate() {
     std::vector<std::vector<int8_t>> board(N, std::vector<int8_t>(cols, -1));
+    for (int i = 0; i < N-2; i++)
+        board[N-1][i] = -2;
+
     std::vector<std::pair<uint8_t, uint8_t>> border_cells;
     std::vector<std::vector<std::pair<uint8_t, char>>> adj_list;
     std::vector<bool> used(N*cols, false);
@@ -31,9 +34,9 @@ void Generator::generate() {
 
     board[N-1][N-1] = counter++;  // 1
     board[N-2][N-2] = counter++;  // 2
-
     used[1] = true;
-    border_cells.emplace_back(N-2, N-2);
+
+    border_cells.emplace_back(N-2, N-2);  // 2
     nextStep(board, border_cells, adj_list, used, N-1, N-1, counter, max_used);
     depth--;
 
@@ -48,7 +51,7 @@ void Generator::generate() {
 void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
                          const std::vector<std::pair<uint8_t, uint8_t>>& available_cells,
                          const std::vector<std::vector<std::pair<uint8_t, char>>>& old_adj_list,
-                         const std::vector<bool>& old_used, const uint8_t added_i, const uint8_t added_j,
+                         const std::vector<bool>& old_used, const uint8_t i, const uint8_t j,
                          const uint8_t old_counter, const uint8_t old_max_used) {
     std::vector<std::vector<int8_t>> board(old_board);
     std::vector<std::pair<uint8_t, uint8_t>> border_cells(available_cells);
@@ -58,24 +61,23 @@ void Generator::nextStep(const std::vector<std::vector<int8_t>>& old_board,
     uint8_t max_used = old_max_used;
     depth++;
 
-    chooseCell(adj_list, used, added_i, added_j, board);
-    max_used = board[added_i][added_j];
-    used[board[added_i][added_j]] = true;
-    addNewBorderCells(board, border_cells, added_i, added_j, counter);
+    chooseCell(adj_list, used, i, j, board);
+    max_used = board[i][j];
+    used[board[i][j]] = true;
+    addNewBorderCells(board, border_cells, i, j, counter);
     updateAvailableBorderCells(border_cells, board, max_used);
 
     std::string code = "";
     generatePolyominoCodes(code, adj_list);
 
-    if (depth < N) {  // <= ?
-        for (const auto& [i, j] : border_cells) {
-            nextStep(board, border_cells, adj_list, used, i, j, counter, max_used);
+    if (depth < N) {
+        for (const auto& [a, b] : border_cells) {
+            nextStep(board, border_cells, adj_list, used, a, b, counter, max_used);
             depth--;
         }
     }
 }
 
-// kiedy robic update max_used??
 // board[i][j] - new cell
 void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
                                   std::vector<std::pair<uint8_t, uint8_t>>& border_cells,
@@ -83,7 +85,7 @@ void Generator::addNewBorderCells(std::vector<std::vector<int8_t>>& board,
     if (isInBounds(i+1,j) && board[i+1][j] == -1) {
         board[i+1][j] = counter++;
         border_cells.emplace_back(i+1,j);
-    } // check
+    }
     if (isInBounds(i,j-1) && board[i][j-1] == -1) {
         board[i][j-1] = counter++;
         border_cells.emplace_back(i,j-1);
@@ -120,7 +122,7 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
         if (static_cast<size_t>(board[i+1][j]) >= adj_list.size())
             resizeList(adj_list, board[i+1][j]);
         adj_list[board[i+1][j]].emplace_back(board[i][j], '1');
-    } else { // down
+    } else {  // down
         if (static_cast<size_t>(board[i-1][j]) >= adj_list.size())
             resizeList(adj_list, board[i-1][j]);
         adj_list[board[i-1][j]].emplace_back(board[i][j], '3');
@@ -129,19 +131,11 @@ void Generator::chooseCell(std::vector<std::vector<std::pair<uint8_t, char>>>& a
 
 void Generator::dfs(std::string& polyomino, std::vector<bool>& used, size_t& visited,
                     const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list, const uint8_t curr) const {
-    /*
-    std::cout << "polyomino: " << &polyomino << '\n';
-    std::cout << "used: " << &used << '\n';
-    std::cout << "visited: " << &visited << '\n';
-    std::cout << "adj_list: " << &adj_list << '\n';
-    std::cout << "depth: " << &depth << '\n';
-    std::cout << "this: " << this << '\n';
-    std::cout << "curr: " << static_cast<int>(curr) << ", adj_list.size(): " << adj_list.size() << '\n';
-    */
-    if (curr >= adj_list.size()) return;
+    if (curr >= adj_list.size())
+        return;
 
     for (const auto& [n,dir] : adj_list[curr]) {
-        if (!used[n] && visited < depth - 1) {  // ? is the 1. necessary
+        if (!used[n] && visited < depth - 1) {
             polyomino += dir;
             used[n] = true;
             visited++;
@@ -153,7 +147,8 @@ void Generator::dfs(std::string& polyomino, std::vector<bool>& used, size_t& vis
     }
 }
 
-void Generator::generatePolyominoCodes(std::string& polyomino, const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list) {
+void Generator::generatePolyominoCodes(std::string& polyomino,
+                                       const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list) {
     size_t visited = 0;
     std::vector<bool> used(adj_list.size(), false);
     used[0] = true;
@@ -179,7 +174,6 @@ void Generator::generateAllOptions(const std::string& code) {
     }
 
     for (const auto& p : polyominoes) {
-        std::cout << p << '\n';
         file << static_cast<int>(depth) << ' ' << p << '\n';
     }
 }

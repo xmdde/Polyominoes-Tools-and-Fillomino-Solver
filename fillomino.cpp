@@ -165,8 +165,6 @@ bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_id
     uint8_t new_j;
     for (int idx = sub1.size() - 1; idx >= 0; --idx) {
         getNewCoords(new_i, new_j, i, j, sub1[idx]);
-        // std::cout << '(' << static_cast<int>(new_i) << ',' << static_cast<int>(new_j) << "), ";
-        // moze zmiana warunku po prostu?
         if (!isInBounds(new_i, new_j) || (board[new_i][new_j].getNum() != n && board[new_i][new_j].getNum() != 0)
             || (board[new_i][new_j].finished && !(new_i == i_idx && new_j == j_idx)))
             return false;
@@ -280,12 +278,6 @@ bool Fillomino::isCellAClue(const uint8_t i, const uint8_t j) const {
     return board[i][j].getNum() != 0 && !board[i][j].finished;
 }
 
-void Fillomino::completeOneWayOfGrowth() {
-}
-
-bool Fillomino::oneWayOfGrowth(uint8_t& n, const uint8_t i, const uint8_t j) const {
-}
-
 void Fillomino::completeOneOption() {
     uint8_t n;
     for (int i = 0; i < rows; i++) {
@@ -350,6 +342,10 @@ void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::ve
                 checked[p.first][p.second]++;
         }
     }
+
+    if (cnt == 0)
+        return;
+
     for (int k = 0; k < rows; k++) {
         for (int l = 0; l < cols; l++) {
             if (checked[k][l] == cnt) {
