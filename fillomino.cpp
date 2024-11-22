@@ -345,14 +345,15 @@ void Fillomino::certainCells(const std::vector<std::vector<std::string>>& codes)
 
 void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j) {
     std::vector<std::vector<uint8_t>> checked(rows, std::vector<uint8_t>(cols, 0));
-    uint8_t cnt = 0;
+    int cnt = 0;
 
     for (const auto& code : codes[board[i][j].getNum()]) {
         std::set<std::pair<uint8_t,uint8_t>> s;
         if (processCodeCrossSection(code, i, j, s)) {
             cnt++;
-            for (const auto& p : s)
+            for (const auto& p : s) {
                 checked[p.first][p.second]++;
+            }
         }
     }
 
@@ -362,11 +363,13 @@ void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::ve
     for (int k = 0; k < rows; k++) {
         for (int l = 0; l < cols; l++) {
             if (checked[k][l] == cnt) {
+                // if (i == 3 && j == 5) std::cout << static_cast<int>(k) << ',' << static_cast<int>(l) << '\n';
                 board[k][l] = board[i][j].getNum();
                 done[k][l] = true;
             }
         }
     }
+
     std::vector<std::pair<uint8_t, uint8_t>> area;
     uint8_t size = getPartialSize(i, j, area);
     for (const auto& [r,c] : area) {

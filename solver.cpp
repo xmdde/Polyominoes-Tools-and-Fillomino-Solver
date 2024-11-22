@@ -40,14 +40,14 @@ void Solver::solve() {
         return;
     }
 
-    for (int cnt = 0; cnt < 5; cnt++) {
+    for (int cnt = 0; cnt < 8; cnt++) {
         //fillomino.certainCells(polyominoes);
         //fillomino.print();
         for (uint8_t i = 0; i < rows; i++)
             for (uint8_t j = 0; j < cols; j++)
                 if (fillomino.isCellAClue(i,j))
                     fillomino.crossSection(checked,polyominoes,i,j);
-        //fillomino.print();
+
         if (fillomino.isSolved()) {
             std::cout << "rozwiazane\n";
             fillomino.print();
@@ -76,14 +76,23 @@ void Solver::solve() {
 bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const {
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
     Fillomino f(rows, cols, b);
-    f.completeOneOption();
 
-    for (uint8_t k = 0; k < rows; k++)
-        for (uint8_t l = 0; l < cols; l++)
+    bool solved = f.isSolved();
+    if (solved) {
+        std::cout << "normalnie rozwiazane\n";
+        f.print();
+        return true;
+    }
+
+    //f.completeOneOption();
+    for (uint8_t k = 0; k < rows; k++) {
+        for (uint8_t l = 0; l < cols; l++) {
             if (f.isCellAClue(k,l))
                 f.crossSection(checked,polyominoes,k,l);
+        }
+    }
 
-    bool solved = f.isSolved();  // na teraz
+    solved = f.isSolved();
     if (solved) {
         std::cout << "normalnie rozwiazane\n";
         f.print();
