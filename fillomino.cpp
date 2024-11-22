@@ -81,7 +81,9 @@ void Fillomino::getPartialSizeHelp(const std::vector<std::vector<Cell>>& b, uint
 
 void Fillomino::getBoardFromFile(const std::string& file) {
     std::ifstream f(file);
-    //if (!f.is_open()) {}
+    if (!f.is_open()) {
+        std::cerr << "Failed to open the file\n";
+    }
 
     f >> rows;
     f >> cols;
@@ -109,6 +111,18 @@ void Fillomino::getBoardFromFile(const std::string& file) {
             }
         }
     }
+}
+
+bool Fillomino::areSizesValid() const {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (board[i][j].getNum() != 0) {
+                if (getPartialSize(board, i, j) > board[i][j].getNum())
+                    return false;
+            }
+        }
+    }
+    return true;
 }
 
 // to check + puste/unfinished pole odciete
@@ -241,8 +255,7 @@ bool Fillomino::invalidEmptyCells(const std::vector<std::vector<Cell>>& b, const
             return false;
     }
 
-    if (opt)
-        return true;
+    //if (opt) return true;
 
     // skoro wszyscy sasiedzi sa finished, pytanie czy mozna wstawic 2
     for (const auto& [k,l] : nbhs) {

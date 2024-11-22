@@ -3,11 +3,7 @@
 #include <chrono>
 
 Solver::Solver(const std::string& file, const std::string& board_file) : fillomino(board_file) {
-    auto start = std::chrono::high_resolution_clock::now();
     getGeneratedPolyominoes(file);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    //std::cout << "Czas wykonania: " << duration.count() << "\n";
 
     rows = fillomino.getRows();
     cols = fillomino.getCols();
@@ -32,21 +28,32 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
 void Solver::solve() {
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
     bool solved = false;
+    if (!fillomino.areSizesValid() || !fillomino.isValid()) {
+        std::cout << "niepoprawne fillomino\n";
+        return;
+    }
     fillomino.completeOneOption();
 
-    for (int cnt = 0; cnt < 5; cnt++) {
-        if (fillomino.isSolved()) {  // na teraz
-            std::cout << "rozwiazane\n";
-            fillomino.print();
-            return;
-        }
+    if (fillomino.isSolved()) {
+        std::cout << "rozwiazane\n";
+        fillomino.print();
+        return;
+    }
 
+    for (int cnt = 0; cnt < 5; cnt++) {
+        //fillomino.certainCells(polyominoes);
+        //fillomino.print();
         for (uint8_t i = 0; i < rows; i++)
             for (uint8_t j = 0; j < cols; j++)
                 if (fillomino.isCellAClue(i,j))
                     fillomino.crossSection(checked,polyominoes,i,j);
+        //fillomino.print();
+        if (fillomino.isSolved()) {
+            std::cout << "rozwiazane\n";
+            fillomino.print();
+            return;
+        }
     }
-    // fillomino.certainCells(polyominoes);
 
     for (uint8_t i = 0; i < rows; i++) {
         for (uint8_t j = 0; j < cols; j++) {
@@ -57,7 +64,6 @@ void Solver::solve() {
                     if (fillomino.processCode(polyomino,i,j,board)) {
                         solved = nextStep(i,j,board);
                         if (solved) {
-                            std::cout << "udalo sie!\n";
                             return;
                         }
                     }

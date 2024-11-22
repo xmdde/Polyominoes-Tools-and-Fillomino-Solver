@@ -45,7 +45,7 @@ public:
     uint8_t getNum(const uint8_t i, const uint8_t j) const;
     void completeOneOption();
     void certainCells(const std::vector<std::vector<std::string>>& codes);
-
+    bool areSizesValid() const;
     int getRows() const {
         return rows;
     }

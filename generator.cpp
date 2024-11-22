@@ -166,7 +166,7 @@ void Generator::generateAllOptions(const std::string& code) {
     while (s2 != "") {
         s1 += getOppositeDir(s2[0]);
         s2 = s2.substr(1);
-        if (s1 == s2.substr(0, s1.length())) {
+        if ((s1 == "00" || s1 == "11" || s1 == "22" || s1 == "33") && s1 == s2.substr(0, s1.length())) {
             s1 = "";
             polyominoes.clear();
         }

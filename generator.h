@@ -31,7 +31,7 @@ class Generator {
     void generateAllOptions(const std::string& code);
 public:
     Generator(const int depth, const std::string& filename) : N(depth), cols(2*(depth-1)), file(filename, std::ios::app) {
-        if (!file.is_open()) std::cerr << "Failed to open result file." << std::endl;
+        if (!file.is_open()) std::cerr << "Failed to open result file.\n";
     }
     void generate();
 };
