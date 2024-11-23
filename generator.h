@@ -30,7 +30,7 @@ class Generator {
     void generatePolyominoCodes(std::string& polyomino, const std::vector<std::vector<std::pair<uint8_t, char>>>& adj_list);
     void generateAllOptions(const std::string& code);
 public:
-    Generator(const int depth, const std::string& filename) : N(depth), cols(2*(depth-1)), file(filename, std::ios::app) {
+    Generator(const int d, const std::string& filename) : N(d), cols(2*(d-1)), file(filename, std::ios::app) {
         if (!file.is_open()) std::cerr << "Failed to open result file.\n";
     }
     void generate();

@@ -33,10 +33,10 @@ void Fillomino::getAllNbhs(const uint8_t i1, const uint8_t j1, const uint8_t i2,
         nbhs.emplace_back(i2, j2-1);
 }
 
-uint8_t Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const {  // dodaj inne wspolrzedne?
+int Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const {  // dodaj inne wspolrzedne?
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
-    uint8_t size = 1;
+    int size = 1;
     getPartialSizeHelp(board, size, used, i, j);
     for (uint8_t r = 0; r < rows; r++) {
         for (uint8_t c = 0; c < cols; c++) {
@@ -47,15 +47,15 @@ uint8_t Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<
     return size;
 }
 
-uint8_t Fillomino::getPartialSize(const std::vector<std::vector<Cell>>& b, const uint8_t i, const uint8_t j) const {
+int Fillomino::getPartialSize(const std::vector<std::vector<Cell>>& b, const uint8_t i, const uint8_t j) const {
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
-    uint8_t size = 1;
+    int size = 1;
     getPartialSizeHelp(b, size, used, i, j);
     return size;
 }
 
-void Fillomino::getPartialSizeHelp(const std::vector<std::vector<Cell>>& b, uint8_t& size, std::vector<std::vector<bool>>& used,
+void Fillomino::getPartialSizeHelp(const std::vector<std::vector<Cell>>& b, int& size, std::vector<std::vector<bool>>& used,
                                    const uint8_t i, const uint8_t j) const {
     if (isInBounds(i-1, j) && !used[i-1][j] && b[i-1][j] == b[i][j]) { // ^
         size++;
@@ -93,6 +93,9 @@ void Fillomino::getBoardFromFile(const std::string& file) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             f >> n;
+            if (n < 0 || n > 9) {
+                validFromFile = false;
+            }
             board[i].push_back(Cell(n));
         }
     }
@@ -105,7 +108,7 @@ void Fillomino::getBoardFromFile(const std::string& file) {
         for (int j = 0; j < cols; j++) {
             if (board[i][j].getNum() != 0) {
                 area.clear();
-                uint8_t size = getPartialSize(i, j, area);
+                int size = getPartialSize(i, j, area);
                 for (const auto& [r,c] : area)
                     board[r][c].setGroupSize(size);
             }
@@ -164,11 +167,12 @@ bool Fillomino::isValid(const std::vector<std::vector<Cell>>& b) const {
     return true;
 }
 
-bool Fillomino::processCode(const std::string& code, uint8_t i_idx, uint8_t j_idx, std::vector<std::vector<Cell>>& b) const {
+bool Fillomino::processCode(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::vector<std::vector<Cell>>& b, const uint8_t number) const {
     std::vector<std::vector<Cell>> boardCopy = board;
 
     boardCopy[i_idx][j_idx].finished = true;
-    const uint8_t n = board[i_idx][j_idx].getNum();
+    const uint8_t n = (number == 33) ? board[i_idx][j_idx].getNum() : number;
+    boardCopy[i_idx][j_idx].setNum(n); 
     const size_t pos = code.find('x');
     std::string sub1 = code.substr(0, pos);
     std::string sub2 = code.substr(pos + 1);
@@ -298,7 +302,7 @@ void Fillomino::completeOneOption() {
             if (board[i][j].getNum() == 0 && oneOption(n,i,j)) {
                 board[i][j].setNum(n);
                 std::vector<std::pair<uint8_t, uint8_t>> area;
-                uint8_t size = getPartialSize(i, j, area);
+                int size = getPartialSize(i, j, area);
                 for (const auto& [r,c] : area)
                     board[r][c].setGroupSize(size);
             }
@@ -371,7 +375,7 @@ void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::ve
     }
 
     std::vector<std::pair<uint8_t, uint8_t>> area;
-    uint8_t size = getPartialSize(i, j, area);
+    int size = getPartialSize(i, j, area);
     for (const auto& [r,c] : area) {
         board[r][c].setGroupSize(size);
         done[r][c] = true;

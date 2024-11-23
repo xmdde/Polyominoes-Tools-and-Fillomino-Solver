@@ -16,8 +16,8 @@ class Solver {
 
     void getGeneratedPolyominoes(const std::string& filename);
     bool nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>& b) const;
-    bool completeEmptyCells();
-    bool nextStepEmpty();
+    bool completeEmptyCells(const std::vector<std::vector<Cell>>& b) const;
+    // bool nextStepEmpty();
 
 public:
     Solver(const std::string& file, const std::string& board_file);

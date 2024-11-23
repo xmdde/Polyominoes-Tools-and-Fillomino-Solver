@@ -5,7 +5,7 @@
 
 class Cell {
     uint8_t num = 0;
-    uint8_t group_size = 0;
+    int group_size = 0;
 public:
     bool finished = false;
 
@@ -23,22 +23,15 @@ public:
         return num;
     }
 
-    void setGroupSize(const uint8_t size) {  // pomysl co z 0 + throw
+    void setGroupSize(const int size) {  // pomysl co z 0 + throw
         group_size = size;
         if (group_size == num && num != 0)
             finished = true;
     }
 
-    uint8_t getGroupSize() const {
+    int getGroupSize() const {
         return group_size;
     }
-
-    /*
-    void updateGroupSize(const uint8_t delta) {  // ?
-        group_size += delta;
-        if (group_size == num)
-            finished = true;
-    }*/
 };
 
 #endif  // POLYOMINOES_CELL_H
