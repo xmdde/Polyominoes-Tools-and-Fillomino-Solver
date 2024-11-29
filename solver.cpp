@@ -30,28 +30,26 @@ void Solver::solve() {
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
     bool solved = false;
     if (!fillomino.validFromFile || !fillomino.areSizesValid() || !fillomino.isValid()) {
-        std::cout << "niepoprawne fillomino\n";
+        std::cout << "incorrect fillomino\n";
         return;
     }
 
     fillomino.completeOneOption();
 
     if (fillomino.isSolved()) {
-        std::cout << "rozwiazane\n";
+        std::cout << "solved\n";
         fillomino.print();
         return;
     }
 
     for (int cnt = 0; cnt < 5; cnt++) {
-        //fillomino.certainCells(polyominoes);
-        //fillomino.print();
         for (uint8_t i = 0; i < rows; i++)
             for (uint8_t j = 0; j < cols; j++)
                 if (fillomino.isCellAClue(i,j))
                     fillomino.crossSection(checked, polyominoes, i, j);
 
         if (fillomino.isSolved()) {
-            std::cout << "rozwiazane\n";
+            std::cout << "solved\n";
             fillomino.print();
             return;
         }
@@ -83,7 +81,7 @@ bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>
 
     bool solved = f.isSolved();
     if (solved) {
-        std::cout << "normalnie rozwiazane\n";
+        std::cout << "solved\n";
         f.print();
         return true;
     }
@@ -98,7 +96,7 @@ bool Solver::nextStep(uint8_t i, uint8_t j, const std::vector<std::vector<Cell>>
 
     solved = f.isSolved();
     if (solved) {
-        std::cout << "normalnie rozwiazane\n";
+        std::cout << "solved\n";
         f.print();
         return true;
     }
@@ -130,7 +128,7 @@ bool Solver::completeEmptyCells(const std::vector<std::vector<Cell>>& b) const {
     Fillomino f(rows, cols, b);
     bool solved = f.isSolved();
     if (solved) {
-        std::cout << "rozwiazane\n";
+        std::cout << "solved\n";
         f.print();
         return true;
     }
@@ -139,8 +137,11 @@ bool Solver::completeEmptyCells(const std::vector<std::vector<Cell>>& b) const {
         for (int j = 0; j < cols; j++) {
             if (f.getNum(i,j) == 0) {
                 const int n = f.getPartialSize(b, i, j);
-                std::cout << n << '\n';
-                for (int s = n; s >= 1; --s) {
+                int s = n;
+                if (n > 9) {
+                    s = 9;
+                }
+                for (s; s >= 1; --s) {
                     for (const auto& polyomino : polyominoes[s]) {
                         std::vector<std::vector<Cell>> board;
                         if (f.processCode(polyomino, i, j, board, s)) {

@@ -11,28 +11,6 @@ bool Fillomino::isInBounds(const uint8_t i, const uint8_t j) const {
     return i >= 0 && i < rows && j >= 0 && j < cols;
 }
 
-// fills vector with all adjecent cells of (i1,j1), (i2,j2)
-void Fillomino::getAllNbhs(const uint8_t i1, const uint8_t j1, const uint8_t i2, const uint8_t j2,
-                           std::vector<std::pair<uint8_t, uint8_t>>& nbhs) const {
-    if (isInBounds(i1+1, j1) && !(i1+1 == i2 && j1 == j2))
-        nbhs.emplace_back(i1+1, j1);
-    if (isInBounds(i1-1, j1) && !(i1-1 == i2 && j1 == j2))
-        nbhs.emplace_back(i1-1, j1);
-    if (isInBounds(i1, j1+1) && !(i1 == i2 && j1+1 == j2))
-        nbhs.emplace_back(i1, j1+1);
-    if (isInBounds(i1, j1-1) && !(i1 == i2 && j1-1 == j2))
-        nbhs.emplace_back(i1, j1-1);
-
-    if (isInBounds(i2+1, j2) && !(i1 == i2+1 && j1 == j2))
-        nbhs.emplace_back(i2+1, j2);
-    if (isInBounds(i2-1, j2) && !(i1 == i2-1 && j1 == j2))
-        nbhs.emplace_back(i2-1, j2);
-    if (isInBounds(i2, j2+1) && !(i1 == i2 && j1 == j2+1))
-        nbhs.emplace_back(i2, j2+1);
-    if (isInBounds(i2, j2-1) && !(i1 == i2 && j1 == j2-1))
-        nbhs.emplace_back(i2, j2-1);
-}
-
 int Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const {  // dodaj inne wspolrzedne?
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
@@ -128,7 +106,6 @@ bool Fillomino::areSizesValid() const {
     return true;
 }
 
-// to check + puste/unfinished pole odciete
 bool Fillomino::isValid() const { 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -216,14 +193,6 @@ bool Fillomino::processCode(const std::string& code, const uint8_t i_idx, const 
 
     bool v = isValid(boardCopy);
     if (v) {
-        /*for (int x = 0; x < rows; x++) {
-            for (int y = 0; y < cols; y++) {
-                std::cout << static_cast<int>(boardCopy[x][y].getNum()) << ' ';
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n";
-        */
         b = boardCopy;
     }
     return v;
@@ -338,7 +307,6 @@ bool Fillomino::oneOption(uint8_t& n, const uint8_t i, const uint8_t j) const {
 
 void Fillomino::certainCells(const std::vector<std::vector<std::string>>& codes) {
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
-    // jak bez powtarzania?
     for (uint8_t i = 0; i < rows; i++)
         for (uint8_t j = 0; j < cols; j++)
             if (!checked[i][j] && isCellAClue(i,j)) {
@@ -367,7 +335,6 @@ void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::ve
     for (int k = 0; k < rows; k++) {
         for (int l = 0; l < cols; l++) {
             if (checked[k][l] == cnt) {
-                // if (i == 3 && j == 5) std::cout << static_cast<int>(k) << ',' << static_cast<int>(l) << '\n';
                 board[k][l] = board[i][j].getNum();
                 done[k][l] = true;
             }
@@ -446,6 +413,28 @@ bool Fillomino::isSolved() const {
 
 uint8_t Fillomino::getNum(const uint8_t i, const uint8_t j) const {
     return board[i][j].getNum();
+}
+
+// fills vector with all adjecent cells of (i1,j1), (i2,j2)
+void Fillomino::getAllNbhs(const uint8_t i1, const uint8_t j1, const uint8_t i2, const uint8_t j2,
+                           std::vector<std::pair<uint8_t, uint8_t>>& nbhs) const {
+    if (isInBounds(i1+1, j1) && !(i1+1 == i2 && j1 == j2))
+        nbhs.emplace_back(i1+1, j1);
+    if (isInBounds(i1-1, j1) && !(i1-1 == i2 && j1 == j2))
+        nbhs.emplace_back(i1-1, j1);
+    if (isInBounds(i1, j1+1) && !(i1 == i2 && j1+1 == j2))
+        nbhs.emplace_back(i1, j1+1);
+    if (isInBounds(i1, j1-1) && !(i1 == i2 && j1-1 == j2))
+        nbhs.emplace_back(i1, j1-1);
+
+    if (isInBounds(i2+1, j2) && !(i1 == i2+1 && j1 == j2))
+        nbhs.emplace_back(i2+1, j2);
+    if (isInBounds(i2-1, j2) && !(i1 == i2-1 && j1 == j2))
+        nbhs.emplace_back(i2-1, j2);
+    if (isInBounds(i2, j2+1) && !(i1 == i2 && j1 == j2+1))
+        nbhs.emplace_back(i2, j2+1);
+    if (isInBounds(i2, j2-1) && !(i1 == i2 && j1 == j2-1))
+        nbhs.emplace_back(i2, j2-1);
 }
 
 void Fillomino::print() const {
