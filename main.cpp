@@ -2,6 +2,7 @@
 #include "fillomino.h"
 #include "solver.h"
 
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -12,11 +13,15 @@ int main(int argc, const char* argv[]) {
     }
 
     if (std::string(argv[1]).compare("-g") == 0) {
-        Generator gen(9, "boards/codes.txt");
+        Generator gen(9, argv[2]);
         gen.generate();
     } else {
         Solver solver("boards/codes.txt", argv[1]);
+        auto start = std::chrono::high_resolution_clock::now();
         solver.solve();
+        auto stop = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = stop - start;
+        std::cout << elapsed.count() << "\n";
     }
     return 0;
 }

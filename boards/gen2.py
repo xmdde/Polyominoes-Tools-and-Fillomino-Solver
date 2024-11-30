@@ -24,8 +24,7 @@ def main():
         print(f"Błąd: Plik '{input_file}' nie istnieje.")
         sys.exit(1)
 
-    # Tworzenie katalogu boards/10x15, jeśli nie istnieje
-    output_dir = "10x10"
+    output_dir = "15x20"
     os.makedirs(output_dir, exist_ok=True)
 
     # Otwieranie pliku wejściowego i przetwarzanie każdej linii
@@ -39,7 +38,7 @@ def main():
         result = process_string(line)
         output_file = os.path.join(output_dir, f"{start_number + idx}.txt")
         with open(output_file, 'w') as out_file:
-            out_file.write("10 10\n")
+            out_file.write("15 20\n")
             out_file.write(result)
 
     print(f"Przetwarzanie zakończone. Wyniki zapisano w folderze '{output_dir}'.")
