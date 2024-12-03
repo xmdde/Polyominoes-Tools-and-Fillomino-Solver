@@ -445,18 +445,4 @@ void Fillomino::print() const {
         std::cout << "\n";
     }
     std::cout << "\n";
-    /*for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            std::cout << static_cast<int>(board[i][j].getGroupSize()) << ' ';
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            std::cout << board[i][j].finished << ' ';
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";*/
 }
