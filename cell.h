@@ -23,7 +23,7 @@ public:
         return num;
     }
 
-    void setGroupSize(const int size) {  // pomysl co z 0 + throw
+    void setGroupSize(const int size) {
         group_size = size;
         if (group_size == num && num != 0)
             finished = true;

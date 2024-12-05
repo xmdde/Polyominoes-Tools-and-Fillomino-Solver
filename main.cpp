@@ -8,7 +8,7 @@
 
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Expected input file\nUsage: ./poly file_name\n";
+        std::cerr << "Expected input file\nUsage: ./poly [fillomino_file polyomino_file | -g polyomino_file]\n";
         return 1;
     }
 
@@ -16,7 +16,7 @@ int main(int argc, const char* argv[]) {
         Generator gen(9, argv[2]);
         gen.generate();
     } else {
-        Solver solver("boards/codes.txt", argv[1]);
+        Solver solver(argv[2], argv[1]);
         auto start = std::chrono::high_resolution_clock::now();
         solver.solve();
         auto stop = std::chrono::high_resolution_clock::now();

@@ -31,6 +31,7 @@ void Generator::generate() {
     uint8_t max_used = 0;
     board[N-1][N-2] = counter++;  // 0
     used[0] = true;
+    file << "1 x\n";
 
     board[N-1][N-1] = counter++;  // 1
     board[N-2][N-2] = counter++;  // 2

@@ -11,7 +11,7 @@ Solver::Solver(const std::string& file, const std::string& board_file) : fillomi
 
 void Solver::getGeneratedPolyominoes(const std::string& filename) {
     polyominoes.resize(10);
-    polyominoes[1].push_back("x");
+    // polyominoes[1].push_back("x");
 
     std::ifstream file(filename);
     int size;
@@ -141,7 +141,7 @@ bool Solver::completeEmptyCells(const std::vector<std::vector<Cell>>& b) const {
                 if (n > 9) {
                     s = 9;
                 }
-                for (s; s >= 1; --s) {
+                for (; s >= 1; --s) {
                     for (const auto& polyomino : polyominoes[s]) {
                         std::vector<std::vector<Cell>> board;
                         if (f.processCode(polyomino, i, j, board, s)) {
