@@ -12,7 +12,6 @@
 class Fillomino {
     int rows;
     int cols;
-    static constexpr bool opt = false;
 
     void getBoardFromFile(const std::string& file);
     int getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const;

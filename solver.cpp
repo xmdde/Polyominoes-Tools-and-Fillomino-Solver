@@ -11,7 +11,6 @@ Solver::Solver(const std::string& file, const std::string& board_file) : fillomi
 
 void Solver::getGeneratedPolyominoes(const std::string& filename) {
     polyominoes.resize(10);
-    // polyominoes[1].push_back("x");
 
     std::ifstream file(filename);
     int size;

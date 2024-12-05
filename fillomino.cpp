@@ -203,8 +203,6 @@ bool Fillomino::isCellBlocked(const std::vector<std::vector<Cell>>& b, const uin
     if ((isInBounds(i+1, j) && !b[i+1][j].finished) || (isInBounds(i-1, j) && !b[i-1][j].finished)
         || (isInBounds(i, j+1) && !b[i][j+1].finished) || (isInBounds(i, j-1) && !b[i][j-1].finished))
         return false;
-    if (opt)
-        return true;
     else if ((isInBounds(i+1, j) && b[i+1][j].getNum() == 1) || (isInBounds(i-1, j) && b[i-1][j].getNum() == 1)
               || (isInBounds(i, j+1) && b[i][j+1].getNum() == 1) || (isInBounds(i, j-1) && b[i][j-1].getNum() == 1))
         return true;
@@ -227,8 +225,6 @@ bool Fillomino::invalidEmptyCells(const std::vector<std::vector<Cell>>& b, const
         if (!b[k][l].finished)
             return false;
     }
-
-    //if (opt) return true;
 
     // skoro wszyscy sasiedzi sa finished, pytanie czy mozna wstawic 2
     for (const auto& [k,l] : nbhs) {
