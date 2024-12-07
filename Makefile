@@ -2,7 +2,7 @@ TARGET = poly
 
 SRC = *.cpp
 
-CXX = g++
+CXX = g++-14
 CXX_VER = -std=c++17
 CXXFLAGS_RELEASE = $(CXX_VER) -O2
 CXXFLAGS_DEBUG = $(CXX_VER) -Wall -Wextra -pedantic -O0 -fsanitize=address -fsanitize=undefined

@@ -41,7 +41,7 @@ void Solver::solve() {
         return;
     }
 
-    for (int cnt = 0; cnt < 8; cnt++) {
+    for (int cnt = 0; cnt < 5; cnt++) {
         for (uint8_t i = 0; i < rows; i++)
             for (uint8_t j = 0; j < cols; j++)
                 if (fillomino.isCellAClue(i,j))

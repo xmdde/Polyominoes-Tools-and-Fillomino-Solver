@@ -11,7 +11,7 @@ bool Fillomino::isInBounds(const uint8_t i, const uint8_t j) const {
     return i >= 0 && i < rows && j >= 0 && j < cols;
 }
 
-int Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const {  // dodaj inne wspolrzedne?
+int Fillomino::getPartialSize(const uint8_t i, const uint8_t j, std::vector<std::pair<uint8_t, uint8_t>>& area) const {
     std::vector<std::vector<bool>> used(rows, std::vector<bool>(cols, false));
     used[i][j] = true;
     int size = 1;
@@ -144,7 +144,8 @@ bool Fillomino::isValid(const std::vector<std::vector<Cell>>& b) const {
     return true;
 }
 
-bool Fillomino::processCode(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::vector<std::vector<Cell>>& b, const uint8_t number) const {
+bool Fillomino::processCode(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::vector<std::vector<Cell>>& b,
+                            const uint8_t number) const {
     std::vector<std::vector<Cell>> boardCopy = board;
 
     boardCopy[i_idx][j_idx].finished = true;
@@ -311,7 +312,8 @@ void Fillomino::certainCells(const std::vector<std::vector<std::string>>& codes)
             }
 }
 
-void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j) {
+void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes,
+                             const uint8_t i, const uint8_t j) {
     std::vector<std::vector<uint8_t>> checked(rows, std::vector<uint8_t>(cols, 0));
     int cnt = 0;
 
@@ -345,7 +347,8 @@ void Fillomino::crossSection(std::vector<std::vector<bool>>& done, const std::ve
     }
 }
 
-bool Fillomino::processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::set<std::pair<uint8_t,uint8_t>>& s) const {
+bool Fillomino::processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx,
+                                        std::set<std::pair<uint8_t,uint8_t>>& s) const {
     std::vector<std::vector<Cell>> boardCopy = board;
 
     boardCopy[i_idx][j_idx].finished = true;
