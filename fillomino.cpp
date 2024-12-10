@@ -436,6 +436,22 @@ void Fillomino::getAllNbhs(const uint8_t i1, const uint8_t j1, const uint8_t i2,
         nbhs.emplace_back(i2, j2-1);
 }
 
+bool Fillomino::checkEmptyCellsNum() const {
+    size_t arr[10] = {};
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            arr[board[i][j].getNum()]++;
+        }
+    }
+    size_t sum = 0;
+    for (size_t i = 2; i < 10; i++) {
+        if (arr[i] != 0) {
+            sum += (i - (arr[i]%i));
+        }
+    }
+    return sum <= arr[0]; 
+}
+
 void Fillomino::print() const {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {

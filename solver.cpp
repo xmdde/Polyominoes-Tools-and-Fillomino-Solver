@@ -26,9 +26,10 @@ void Solver::getGeneratedPolyominoes(const std::string& filename) {
 }
 
 void Solver::solve() {
+    const int p = 6;
     std::vector<std::vector<bool>> checked(rows, std::vector<bool>(cols, false));
     bool solved = false;
-    if (!fillomino.validFromFile || !fillomino.areSizesValid() || !fillomino.isValid()) {
+    if (!fillomino.validFromFile || !fillomino.areSizesValid() || !fillomino.checkEmptyCellsNum() || !fillomino.isValid()) {
         std::cout << "incorrect fillomino\n";
         return;
     }
@@ -41,7 +42,7 @@ void Solver::solve() {
         return;
     }
 
-    for (int cnt = 0; cnt < 5; cnt++) {
+    for (int cnt = 0; cnt < p; cnt++) {
         for (uint8_t i = 0; i < rows; i++)
             for (uint8_t j = 0; j < cols; j++)
                 if (fillomino.isCellAClue(i,j))

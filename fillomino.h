@@ -26,8 +26,6 @@ class Fillomino {
     bool oneOption(uint8_t& n, const uint8_t i, const uint8_t j) const;
     bool processCodeCrossSection(const std::string& code, const uint8_t i_idx, const uint8_t j_idx, std::set<std::pair<uint8_t,uint8_t>>& s) const;
 public:
-    void crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j);
-public:
     std::vector<std::vector<Cell>> board;
     bool validFromFile = true;
 
@@ -47,7 +45,9 @@ public:
     uint8_t getNum(const uint8_t i, const uint8_t j) const;
     void completeOneOption();
     void certainCells(const std::vector<std::vector<std::string>>& codes);
+    void crossSection(std::vector<std::vector<bool>>& done, const std::vector<std::vector<std::string>>& codes, const uint8_t i, const uint8_t j);
     bool areSizesValid() const;
+    bool checkEmptyCellsNum() const;
 
     int getRows() const {
         return rows;
